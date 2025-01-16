@@ -21,7 +21,7 @@ export default function LoginPage() {
         setError('Invalid username or password');
       }
     } catch (error) {
-      setError('An error occurred during login');
+      setError('An error occurred during login' + error);
     }
   };
 
