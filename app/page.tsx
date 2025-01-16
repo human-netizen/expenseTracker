@@ -11,12 +11,17 @@ export default function LoginPage() {
   const { login } = useAppContext();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(username, password)) {
-      router.push('/dashboard');
-    } else {
-      setError('Invalid username or password');
+    try {
+      const isLoggedIn = await login(username, password);
+      if (isLoggedIn) {
+        router.push('/dashboard');
+      } else {
+        setError('Invalid username or password');
+      }
+    } catch (error) {
+      setError('An error occurred during login');
     }
   };
 
