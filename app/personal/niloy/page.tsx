@@ -15,7 +15,7 @@ type Expense = {
 };
 
 export default function NiloyPersonalPage() {
-  const { user, expenses, addExpense } = useAppContext();
+  const { expenses, addExpense } = useAppContext();
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);

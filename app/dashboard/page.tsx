@@ -126,7 +126,7 @@ export default function DashboardPage() {
               <p className="text-2xl font-bold text-blue-700">${totalJointExpenses.toFixed(2)}</p>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-blue-600 mb-1">Niloy's Contribution</h4>
+              <h4 className="text-sm font-medium text-blue-600 mb-1">Niloy&apos;s Contribution</h4>
               <p className="text-xl font-bold text-blue-700">
                 ${jointExpenses.filter(e => e.name === 'niloy').reduce((sum, e) => sum + e.amount, 0).toFixed(2)}
               </p>
@@ -135,7 +135,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-blue-600 mb-1">Sejuti's Contribution</h4>
+              <h4 className="text-sm font-medium text-blue-600 mb-1">Sejuti&apos;s Contribution</h4>
               <p className="text-xl font-bold text-blue-700">
                 ${jointExpenses.filter(e => e.name === 'sejuti').reduce((sum, e) => sum + e.amount, 0).toFixed(2)}
               </p>
@@ -149,11 +149,11 @@ export default function DashboardPage() {
         {/* Personal Expenses Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="card bg-gradient-to-br from-green-50 to-green-100">
-            <h3 className="text-lg font-semibold mb-2 text-green-800">Niloy's Personal</h3>
+            <h3 className="text-lg font-semibold mb-2 text-green-800">Niloy&apos;s Personal</h3>
             <p className="text-2xl font-bold text-green-600">${totalNiloyPersonal.toFixed(2)}</p>
           </div>
           <div className="card bg-gradient-to-br from-purple-50 to-purple-100">
-            <h3 className="text-lg font-semibold mb-2 text-purple-800">Sejuti's Personal</h3>
+            <h3 className="text-lg font-semibold mb-2 text-purple-800">Sejuti&apos;s Personal</h3>
             <p className="text-2xl font-bold text-purple-600">${totalSejutiPersonal.toFixed(2)}</p>
           </div>
         </div>
