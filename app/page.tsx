@@ -13,10 +13,16 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (await login(username, password)) {
-      router.push("/dashboard")
-    } else {
-      setError("Invalid username or password")
+    setError("")
+    try {
+      if (await login(username, password)) {
+        router.push("/dashboard")
+      } else {
+        setError("Invalid username or password")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      setError("An unexpected error occurred. Please try again.")
     }
   }
 

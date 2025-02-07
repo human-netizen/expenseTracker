@@ -2,9 +2,23 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+let supabase: SupabaseClient
+
+const initSupabase = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error("Supabase URL or Anon Key is missing")
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey)
+}
+
+supabase = initSupabase()!
 
 type User = {
   username: string
@@ -51,12 +65,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [])
 
   const fetchExpenses = async () => {
-    const { data, error } = await supabase.from("expenses").select("*").order("date", { ascending: false })
+    if (!supabase) {
+      console.error("Supabase client is not initialized")
+      return
+    }
 
-    if (error) {
-      console.error("Error fetching expenses:", error)
-    } else {
+    try {
+      const { data, error } = await supabase.from("expenses").select("*").order("date", { ascending: false })
+
+      if (error) {
+        console.error("Error fetching expenses:", error.message, error.details)
+        return
+      }
+
       setExpenses(data || [])
+    } catch (error) {
+      console.error("Unexpected error in fetchExpenses:", error)
     }
   }
 
@@ -83,32 +107,64 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }
 
   const addExpense = async (expense: Omit<Expense, "id">) => {
-    const { data, error } = await supabase.from("expenses").insert([expense]).select()
+    if (!supabase) {
+      console.error("Supabase client is not initialized")
+      return
+    }
 
-    if (error) {
-      console.error("Error adding expense:", error)
-    } else if (data) {
-      setExpenses([...expenses, data[0]])
+    try {
+      const { data, error } = await supabase.from("expenses").insert([expense]).select()
+
+      if (error) {
+        console.error("Error adding expense:", error.message, error.details)
+        return
+      }
+
+      if (data) {
+        setExpenses([...expenses, data[0]])
+      }
+    } catch (error) {
+      console.error("Unexpected error in addExpense:", error)
     }
   }
 
   const updateExpense = async (expense: Expense) => {
-    const { error } = await supabase.from("expenses").update(expense).eq("id", expense.id)
+    if (!supabase) {
+      console.error("Supabase client is not initialized")
+      return
+    }
 
-    if (error) {
-      console.error("Error updating expense:", error)
-    } else {
+    try {
+      const { error } = await supabase.from("expenses").update(expense).eq("id", expense.id)
+
+      if (error) {
+        console.error("Error updating expense:", error.message, error.details)
+        return
+      }
+
       setExpenses(expenses.map((e) => (e.id === expense.id ? expense : e)))
+    } catch (error) {
+      console.error("Unexpected error in updateExpense:", error)
     }
   }
 
   const deleteExpense = async (id: string) => {
-    const { error } = await supabase.from("expenses").delete().eq("id", id)
+    if (!supabase) {
+      console.error("Supabase client is not initialized")
+      return
+    }
 
-    if (error) {
-      console.error("Error deleting expense:", error)
-    } else {
+    try {
+      const { error } = await supabase.from("expenses").delete().eq("id", id)
+
+      if (error) {
+        console.error("Error deleting expense:", error.message, error.details)
+        return
+      }
+
       setExpenses(expenses.filter((e) => e.id !== id))
+    } catch (error) {
+      console.error("Unexpected error in deleteExpense:", error)
     }
   }
 
