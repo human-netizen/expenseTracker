@@ -26,7 +26,7 @@ export default function DashboardPage() {
     } else {
       fetchExpenses()
     }
-  }, [user, router, fetchExpenses]) // Added fetchExpenses to dependencies
+  }, [user, router, fetchExpenses])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

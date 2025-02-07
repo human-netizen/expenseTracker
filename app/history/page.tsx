@@ -1,14 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAppContext } from "../context/AppContext"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function HistoryPage() {
-  const { expenses } = useAppContext()
+  const { expenses, fetchExpenses } = useAppContext()
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+
+  useEffect(() => {
+    fetchExpenses()
+  }, [fetchExpenses])
 
   const filteredExpenses = selectedDate
     ? expenses.filter((expense) => {

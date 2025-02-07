@@ -1,121 +1,123 @@
-'use client'
+"use client"
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import type React from "react"
+import { createContext, useContext, useState, useEffect } from "react"
+import { createClient } from "@supabase/supabase-js"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 type User = {
-  username: string;
-  password: string;
-};
+  username: string
+}
 
 type Expense = {
-  id: string;
-  name: string;
-  category: string;
-  date: string;
-  amount: number;
-};
+  id: string
+  name: string
+  category: string
+  date: string
+  amount: number
+}
 
 type AppContextType = {
-  user: User | null;
-  expenses: Expense[];
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
-  updateExpense: (expense: Expense) => Promise<void>;
-};
+  user: User | null
+  expenses: Expense[]
+  login: (username: string, password: string) => Promise<boolean>
+  logout: () => void
+  addExpense: (expense: Omit<Expense, "id">) => Promise<void>
+  updateExpense: (expense: Expense) => Promise<void>
+  deleteExpense: (id: string) => Promise<void>
+  fetchExpenses: () => Promise<void>
+}
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+const AppContext = createContext<AppContextType | undefined>(undefined)
 
 export const useAppContext = () => {
-  const context = useContext(AppContext);
+  const context = useContext(AppContext)
   if (!context) {
-    throw new Error('useAppContext must be used within an AppProvider');
+    throw new Error("useAppContext must be used within an AppProvider")
   }
-  return context;
-};
+  return context
+}
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [user, setUser] = useState<User | null>(null)
+  const [expenses, setExpenses] = useState<Expense[]>([])
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user")
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(JSON.parse(storedUser))
     }
-
-    fetchExpenses();
-  }, []);
+  }, [])
 
   const fetchExpenses = async () => {
-    const { data, error } = await supabase
-      .from('expenses')
-      .select('*')
-      .order('date', { ascending: false });
+    const { data, error } = await supabase.from("expenses").select("*").order("date", { ascending: false })
 
     if (error) {
-      console.error('Error fetching expenses:', error);
+      console.error("Error fetching expenses:", error)
     } else {
-      setExpenses(data || []);
+      setExpenses(data || [])
     }
-  };
+  }
 
   const login = async (username: string, password: string) => {
-    const users: User[] = [
-      { username: 'niloy', password: 'seju' },
-      { username: 'sejuti', password: 'nilui' }
-    ];
+    const users = [
+      { username: "niloy", password: "seju" },
+      { username: "sejuti", password: "nilui" },
+    ]
 
-    const foundUser = users.find(u => u.username === username && u.password === password);
+    const foundUser = users.find((u) => u.username === username && u.password === password)
     if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem('user', JSON.stringify(foundUser));
-      return true;
+      setUser({ username: foundUser.username })
+      localStorage.setItem("user", JSON.stringify({ username: foundUser.username }))
+      await fetchExpenses()
+      return true
     }
-    return false;
-  };
+    return false
+  }
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-  };
+    setUser(null)
+    localStorage.removeItem("user")
+    setExpenses([])
+  }
 
-  const addExpense = async (expense: Omit<Expense, 'id'>) => {
-    const { data, error } = await supabase
-      .from('expenses')
-      .insert([expense])
-      .select();
+  const addExpense = async (expense: Omit<Expense, "id">) => {
+    const { data, error } = await supabase.from("expenses").insert([expense]).select()
 
     if (error) {
-      console.error('Error adding expense:', error);
+      console.error("Error adding expense:", error)
     } else if (data) {
-      setExpenses([...expenses, data[0]]);
+      setExpenses([...expenses, data[0]])
     }
-  };
+  }
 
   const updateExpense = async (expense: Expense) => {
-    const { error } = await supabase
-      .from('expenses')
-      .update(expense)
-      .eq('id', expense.id);
+    const { error } = await supabase.from("expenses").update(expense).eq("id", expense.id)
 
     if (error) {
-      console.error('Error updating expense:', error);
+      console.error("Error updating expense:", error)
     } else {
-      setExpenses(expenses.map(e => e.id === expense.id ? expense : e));
+      setExpenses(expenses.map((e) => (e.id === expense.id ? expense : e)))
     }
-  };
+  }
+
+  const deleteExpense = async (id: string) => {
+    const { error } = await supabase.from("expenses").delete().eq("id", id)
+
+    if (error) {
+      console.error("Error deleting expense:", error)
+    } else {
+      setExpenses(expenses.filter((e) => e.id !== id))
+    }
+  }
 
   return (
-    <AppContext.Provider value={{ user, expenses, login, logout, addExpense, updateExpense }}>
+    <AppContext.Provider
+      value={{ user, expenses, login, logout, addExpense, updateExpense, deleteExpense, fetchExpenses }}
+    >
       {children}
     </AppContext.Provider>
-  );
-};
+  )
+}
 
