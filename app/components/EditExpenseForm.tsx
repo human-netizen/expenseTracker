@@ -1,37 +1,37 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 
 type Expense = {
-  id: string
-  name: string
-  category: string
-  date: string
-  amount: number
-}
+  id: string;
+  name: string;
+  category: string;
+  date: string;
+  amount: number;
+};
 
 type EditExpenseFormProps = {
-  expense: Expense
-  onCancel: () => void
-  onSave: (expense: Expense) => Promise<void>
-}
+  expense: Expense;
+  onCancel: () => void;
+};
 
-export default function EditExpenseForm({ expense, onCancel, onSave }: EditExpenseFormProps) {
-  const [category, setCategory] = useState(expense.category)
-  const [amount, setAmount] = useState(expense.amount.toString())
-  const [date, setDate] = useState(expense.date)
+export default function EditExpenseForm({ expense, onCancel }: EditExpenseFormProps) {
+  const { updateExpense } = useAppContext();
+  const [category, setCategory] = useState(expense.category);
+  const [amount, setAmount] = useState(expense.amount.toString());
+  const [date, setDate] = useState(expense.date);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await onSave({
+    e.preventDefault();
+    await updateExpense({
       ...expense,
       category,
-      amount: Number.parseFloat(amount),
+      amount: parseFloat(amount),
       date,
-    })
-    onCancel()
-  }
+    });
+    onCancel();
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,14 +75,21 @@ export default function EditExpenseForm({ expense, onCancel, onSave }: EditExpen
         />
       </div>
       <div className="flex justify-end space-x-2">
-        <button type="button" onClick={onCancel} className="btn-secondary">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="btn-secondary"
+        >
           Cancel
         </button>
-        <button type="submit" className="btn-primary">
+        <button
+          type="submit"
+          className="btn-primary"
+        >
           Save
         </button>
       </div>
     </form>
-  )
+  );
 }
 

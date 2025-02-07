@@ -28,21 +28,3 @@
   }
 }
 
-/* Calendar styles */
-.rdp {
-  --rdp-cell-size: 40px;
-  --rdp-accent-color: #3b82f6;
-  --rdp-background-color: #e0e7ff;
-  --rdp-accent-color-dark: #2563eb;
-  --rdp-background-color-dark: #3b82f6;
-  --rdp-outline: 2px solid var(--rdp-accent-color);
-  --rdp-outline-selected: 2px solid var(--rdp-accent-color);
-}
-
-.rdp-day_selected,
-.rdp-day_selected:focus-visible,
-.rdp-day_selected:hover {
-  background-color: var(--rdp-accent-color);
-  color: white;
-}
-
