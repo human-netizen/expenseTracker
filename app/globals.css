@@ -1,6 +1,6 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --color-bg-primary: #f8fafc;
@@ -28,7 +28,7 @@
   }
 }
 
-/* DayPicker styles */
+/* Calendar styles */
 .rdp {
   --rdp-cell-size: 40px;
   --rdp-accent-color: #3b82f6;

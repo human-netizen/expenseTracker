@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { useAppContext } from '../context/AppContext'
-import { usePathname } from 'next/navigation'
+import Link from "next/link"
+import { useAppContext } from "../context/AppContext"
+import { usePathname } from "next/navigation"
 
 export default function Navbar() {
   const { user, logout } = useAppContext()
@@ -20,16 +20,14 @@ export default function Navbar() {
               <Link
                 href="/dashboard"
                 className={`text-sm ${
-                  pathname === '/dashboard' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  pathname === "/dashboard" ? "text-blue-600" : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 Dashboard
               </Link>
               <Link
                 href="/history"
-                className={`text-sm ${
-                  pathname === '/history' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                }`}
+                className={`text-sm ${pathname === "/history" ? "text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
               >
                 History
               </Link>

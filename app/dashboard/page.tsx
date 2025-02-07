@@ -1,50 +1,68 @@
-'use client'
+"use client"
 
-import { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
-import EditExpenseForm from '../components/EditExpenseForm';
+import { useState, useEffect } from "react"
+import { useAppContext } from "../context/AppContext"
+import { useRouter } from "next/navigation"
+import EditExpenseForm from "../components/EditExpenseForm"
 
 type Expense = {
-  id: string;
-  name: string;
-  category: string;
-  date: string;
-  amount: number;
-};
+  id: string
+  name: string
+  category: string
+  date: string
+  amount: number
+}
 
 export default function DashboardPage() {
-  const { user, expenses, addExpense } = useAppContext();
-  const [category, setCategory] = useState('');
-  const [amount, setAmount] = useState('');
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const { user, expenses, addExpense, updateExpense, deleteExpense, fetchExpenses } = useAppContext()
+  const [category, setCategory] = useState("")
+  const [amount, setAmount] = useState("")
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/")
+    } else {
+      fetchExpenses()
+    }
+  }, [user, router, fetchExpenses]) // Added fetchExpenses to dependencies
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     await addExpense({
       name: user!.username,
       category,
-      date: new Date().toISOString().split('T')[0],
-      amount: parseFloat(amount),
-    });
-    setCategory('');
-    setAmount('');
-  };
+      date: new Date().toISOString().split("T")[0],
+      amount: Number.parseFloat(amount),
+    })
+    setCategory("")
+    setAmount("")
+  }
 
-  const currentMonth = new Date().toLocaleString('default', { month: 'long' });
-  const currentYear = new Date().getFullYear();
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this expense?")) {
+      await deleteExpense(id)
+    }
+  }
 
-  const currentMonthExpenses = expenses.filter(expense => {
-    const expenseDate = new Date(expense.date);
-    return expenseDate.getMonth() === new Date().getMonth() && expenseDate.getFullYear() === currentYear;
-  });
+  const currentMonth = new Date().toLocaleString("default", { month: "long" })
+  const currentYear = new Date().getFullYear()
+
+  const currentMonthExpenses = expenses.filter((expense) => {
+    const expenseDate = new Date(expense.date)
+    return expenseDate.getMonth() === new Date().getMonth() && expenseDate.getFullYear() === currentYear
+  })
 
   const totalExpenseNiloy = currentMonthExpenses
-    .filter(expense => expense.name === 'niloy')
-    .reduce((sum, expense) => sum + expense.amount, 0);
+    .filter((expense) => expense.name === "niloy")
+    .reduce((sum, expense) => sum + expense.amount, 0)
 
   const totalExpenseSejuti = currentMonthExpenses
-    .filter(expense => expense.name === 'sejuti')
-    .reduce((sum, expense) => sum + expense.amount, 0);
+    .filter((expense) => expense.name === "sejuti")
+    .reduce((sum, expense) => sum + expense.amount, 0)
+
+  if (!user) return null
 
   return (
     <div className="space-y-8">
@@ -74,20 +92,28 @@ export default function DashboardPage() {
       </div>
 
       <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Expenses for {currentMonth} {currentYear}</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Expenses for {currentMonth} {currentYear}
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Category
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentMonthExpenses.map(expense => (
+              {currentMonthExpenses.map((expense) => (
                 <tr key={expense.id}>
                   <td className="px-6 py-4 whitespace-nowrap">{expense.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{expense.category}</td>
@@ -96,9 +122,12 @@ export default function DashboardPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => setEditingExpense(expense)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 hover:text-blue-900 mr-2"
                     >
                       Edit
+                    </button>
+                    <button onClick={() => handleDelete(expense.id)} className="text-red-600 hover:text-red-900">
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -123,14 +152,11 @@ export default function DashboardPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Edit Expense</h3>
-            <EditExpenseForm
-              expense={editingExpense}
-              onCancel={() => setEditingExpense(null)}
-            />
+            <EditExpenseForm expense={editingExpense} onCancel={() => setEditingExpense(null)} onSave={updateExpense} />
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }
 

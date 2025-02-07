@@ -1,29 +1,24 @@
-'use client'
+"use client"
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppContext } from './context/AppContext';
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAppContext } from "./context/AppContext"
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAppContext();
-  const router = useRouter();
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const { login } = useAppContext()
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const isLoggedIn = await login(username, password);
-      if (isLoggedIn) {
-        router.push('/dashboard');
-      } else {
-        setError('Invalid username or password');
-      }
-    } catch (error) {
-      setError('An error occurred during login' + error);
+    e.preventDefault()
+    if (await login(username, password)) {
+      router.push("/dashboard")
+    } else {
+      setError("Invalid username or password")
     }
-  };
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
@@ -63,6 +58,6 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
-  );
+  )
 }
 
